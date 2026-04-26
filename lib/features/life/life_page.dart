@@ -70,6 +70,12 @@ class _LifePageState extends State<LifePage> {
     return 2;
   }
 
+  void resetGame() {
+    setState(() {
+      players = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -83,24 +89,49 @@ class _LifePageState extends State<LifePage> {
     }
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: GridView.builder(
-          itemCount: players.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getCrossAxisCount(players.length),
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 0.85,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: Row(
+              children: [
+                Text(
+                  'Partida',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: resetGame,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reconfigurar'),
+                ),
+              ],
+            ),
           ),
-          itemBuilder: (context, index) {
-            return PlayerLifeCard(
-              player: players[index],
-              onIncrement: () => incrementLife(index),
-              onDecrement: () => decrementLife(index),
-            );
-          },
-        ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: GridView.builder(
+                itemCount: players.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: getCrossAxisCount(players.length),
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.85,
+                ),
+                itemBuilder: (context, index) {
+                  return PlayerLifeCard(
+                    player: players[index],
+                    onIncrement: () => incrementLife(index),
+                    onDecrement: () => decrementLife(index),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
