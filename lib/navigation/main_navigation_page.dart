@@ -1,3 +1,5 @@
+import 'package:commander_counter/features/counters/counters_page.dart';
+import 'package:commander_counter/features/game/game_page.dart';
 import 'package:flutter/material.dart';
 
 import '../features/life/life_page.dart';
@@ -29,13 +31,29 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     });
   }
 
+  void login() {
+    setState(() {
+      isLoggedIn = true;
+    });
+  }
+
+  void logout() {
+    setState(() {
+      isLoggedIn = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
-      AuthRequiredPage(title: 'Game', onLoginPressed: goToProfile),
-      AuthRequiredPage(title: 'Counters', onLoginPressed: goToProfile),
+      isLoggedIn
+          ? const GamePage()
+          : AuthRequiredPage(title: 'Game', onLoginPressed: goToProfile),
+      isLoggedIn
+          ? const CountersPage()
+          : AuthRequiredPage(title: 'Counters', onLoginPressed: goToProfile),
       const LifePage(),
-      const ProfilePage(),
+      ProfilePage(isLoggedIn: isLoggedIn, onLogin: login, onLogout: logout),
     ];
 
     return Scaffold(
