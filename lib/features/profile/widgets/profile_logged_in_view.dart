@@ -1,3 +1,4 @@
+import 'package:commander_counter/features/history/pages/match_history_page.dart';
 import 'package:flutter/material.dart';
 
 class ProfileLoggedInView extends StatelessWidget {
@@ -31,7 +32,13 @@ class ProfileLoggedInView extends StatelessWidget {
               leading: const Icon(Icons.history),
               title: const Text('Histórico de partidas'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchHistoryPage(),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),
