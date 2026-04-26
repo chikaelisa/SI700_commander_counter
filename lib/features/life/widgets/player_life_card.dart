@@ -6,12 +6,14 @@ class PlayerLifeCard extends StatelessWidget {
   final PlayerLife player;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
+  final VoidCallback onEditName;
 
   const PlayerLifeCard({
     super.key,
     required this.player,
     required this.onIncrement,
     required this.onDecrement,
+    required this.onEditName,
   });
 
   @override
@@ -22,13 +24,28 @@ class PlayerLifeCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            Text(
-              player.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            InkWell(
+              onTap: onEditName,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        player.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.edit, size: 16),
+                  ],
+                ),
+              ),
             ),
             const Spacer(),
             Text(

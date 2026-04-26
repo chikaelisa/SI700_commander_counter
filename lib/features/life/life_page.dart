@@ -76,6 +76,61 @@ class _LifePageState extends State<LifePage> {
     });
   }
 
+  void updatePlayerName(int index, String newName) {
+    final trimmedName = newName.trim();
+
+    if (trimmedName.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      final player = players[index];
+
+      players[index] = player.copyWith(name: trimmedName);
+    });
+  }
+
+  Future<void> showEditNameDialog(int index) async {
+    final controller = TextEditingController(text: players[index].name);
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar nome'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Nome do jogador',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text);
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (newName != null) {
+      updatePlayerName(index, newName);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -126,6 +181,7 @@ class _LifePageState extends State<LifePage> {
                     player: players[index],
                     onIncrement: () => incrementLife(index),
                     onDecrement: () => decrementLife(index),
+                    onEditName: () => showEditNameDialog(index),
                   );
                 },
               ),
