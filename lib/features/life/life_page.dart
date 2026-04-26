@@ -1,3 +1,4 @@
+import 'package:commander_counter/features/life/widgets/player_life_card.dart';
 import 'package:flutter/material.dart';
 
 import 'models/player_life.dart';
@@ -41,6 +42,34 @@ class _LifePageState extends State<LifePage> {
     });
   }
 
+  void incrementLife(int index) {
+    setState(() {
+      final player = players[index];
+
+      players[index] = player.copyWith(life: player.life + 1);
+    });
+  }
+
+  void decrementLife(int index) {
+    setState(() {
+      final player = players[index];
+
+      players[index] = player.copyWith(life: player.life - 1);
+    });
+  }
+
+  int getCrossAxisCount(int playerCount) {
+    if (playerCount <= 2) {
+      return 1;
+    }
+
+    if (playerCount <= 4) {
+      return 2;
+    }
+
+    return 2;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -54,10 +83,23 @@ class _LifePageState extends State<LifePage> {
     }
 
     return SafeArea(
-      child: Center(
-        child: Text(
-          'Partida criada com ${players.length} jogadores',
-          style: Theme.of(context).textTheme.headlineSmall,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: GridView.builder(
+          itemCount: players.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getCrossAxisCount(players.length),
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 0.85,
+          ),
+          itemBuilder: (context, index) {
+            return PlayerLifeCard(
+              player: players[index],
+              onIncrement: () => incrementLife(index),
+              onDecrement: () => decrementLife(index),
+            );
+          },
         ),
       ),
     );
