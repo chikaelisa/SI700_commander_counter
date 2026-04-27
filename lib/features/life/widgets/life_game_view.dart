@@ -12,6 +12,7 @@ class LifeGameView extends StatelessWidget {
   final void Function(int index) onEditName;
   final void Function(int index) onEditCommander;
   final void Function(int index) onOpenPlayerSettings;
+  final VoidCallback onEndGame;
 
   const LifeGameView({
     super.key,
@@ -23,6 +24,7 @@ class LifeGameView extends StatelessWidget {
     required this.onEditName,
     required this.onEditCommander,
     required this.onOpenPlayerSettings,
+    required this.onEndGame,
   });
 
   int getCrossAxisCount(int playerCount) {
@@ -53,6 +55,12 @@ class LifeGameView extends StatelessWidget {
                   onPressed: onResetGame,
                   icon: const Icon(Icons.refresh),
                   label: const Text('Reconfigurar'),
+                ),
+                const SizedBox(width: 4),
+                FilledButton.tonalIcon(
+                  onPressed: onEndGame,
+                  icon: const Icon(Icons.flag_outlined),
+                  label: const Text('Encerrar'),
                 ),
               ],
             ),

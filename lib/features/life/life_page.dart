@@ -5,6 +5,7 @@ import 'constants/player_card_colors.dart';
 import 'models/mana_color.dart';
 import 'models/player_life.dart';
 import 'widgets/edit_player_bottom_sheet.dart';
+import 'widgets/end_game_bottom_sheet.dart';
 import 'widgets/life_setup_panel.dart';
 
 class LifePage extends StatefulWidget {
@@ -125,6 +126,20 @@ class _LifePageState extends State<LifePage> {
     });
   }
 
+  void finishGame({required String? winnerName, required String comment}) {
+    setState(() {
+      players = [];
+    });
+
+    final message = widget.isLoggedIn && winnerName != null
+        ? 'Partida finalizada. Vencedor: $winnerName'
+        : 'Partida encerrada.';
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> showEditNameDialog(int index) async {
     final controller = TextEditingController(text: players[index].name);
 
@@ -238,6 +253,24 @@ class _LifePageState extends State<LifePage> {
     );
   }
 
+  Future<void> showEndGameBottomSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) {
+        return EndGameBottomSheet(
+          players: players,
+          isLoggedIn: widget.isLoggedIn,
+          onFinishGame:
+              ({required String? winnerName, required String comment}) {
+                finishGame(winnerName: winnerName, comment: comment);
+              },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -261,6 +294,7 @@ class _LifePageState extends State<LifePage> {
       onEditName: showEditNameDialog,
       onEditCommander: showEditCommanderDialog,
       onOpenPlayerSettings: showEditPlayerBottomSheet,
+      onEndGame: showEndGameBottomSheet,
     );
   }
 }
