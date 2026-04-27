@@ -1,6 +1,7 @@
 import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
+import 'constants/player_card_colors.dart';
 import 'models/mana_color.dart';
 import 'models/player_life.dart';
 import 'widgets/edit_player_bottom_sheet.dart';
@@ -41,7 +42,9 @@ class _LifePageState extends State<LifePage> {
           name: 'Jogador ${index + 1}',
           life: startingLife,
           commanderName: '',
-          backgroundColor: Colors.grey.shade200,
+          backgroundColor:
+              playerCardBackgroundColors[index %
+                  playerCardBackgroundColors.length],
         ),
       );
     });
@@ -96,6 +99,7 @@ class _LifePageState extends State<LifePage> {
     required String name,
     required String commanderName,
     required List<ManaColor> manaColors,
+    required Color backgroundColor,
   }) {
     final trimmedName = name.trim();
 
@@ -110,6 +114,7 @@ class _LifePageState extends State<LifePage> {
         name: trimmedName,
         commanderName: commanderName.trim(),
         manaColors: manaColors,
+        backgroundColor: backgroundColor,
       );
     });
   }
@@ -218,12 +223,14 @@ class _LifePageState extends State<LifePage> {
                 required String name,
                 required String commanderName,
                 required List<ManaColor> manaColors,
+                required Color backgroundColor,
               }) {
                 updatePlayerSettings(
                   index: index,
                   name: name,
                   commanderName: commanderName,
                   manaColors: manaColors,
+                  backgroundColor: backgroundColor,
                 );
               },
         );

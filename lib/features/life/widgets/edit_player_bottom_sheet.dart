@@ -1,3 +1,4 @@
+import 'package:commander_counter/features/life/constants/player_card_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../models/mana_color.dart';
@@ -11,6 +12,7 @@ class EditPlayerBottomSheet extends StatefulWidget {
     required String name,
     required String commanderName,
     required List<ManaColor> manaColors,
+    required Color backgroundColor,
   })
   onSave;
 
@@ -28,6 +30,7 @@ class EditPlayerBottomSheet extends StatefulWidget {
 class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
   late final TextEditingController nameController;
   late final TextEditingController commanderController;
+  late Color selectedBackgroundColor;
   late List<ManaColor> selectedManaColors;
 
   @override
@@ -39,6 +42,7 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
       text: widget.player.commanderName,
     );
     selectedManaColors = List.of(widget.player.manaColors);
+    selectedBackgroundColor = widget.player.backgroundColor;
   }
 
   @override
@@ -70,6 +74,7 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
       name: name,
       commanderName: commanderController.text.trim(),
       manaColors: selectedManaColors,
+      backgroundColor: selectedBackgroundColor,
     );
 
     Navigator.of(context).pop();
@@ -147,6 +152,47 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
                     selected: isSelected,
                     label: Text('${manaColor.symbol} · ${manaColor.label}'),
                     onSelected: (_) => toggleManaColor(manaColor),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Cor do card',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: playerCardBackgroundColors.map((color) {
+                  final isSelected = selectedBackgroundColor == color;
+
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        selectedBackgroundColor = color;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outlineVariant,
+                          width: isSelected ? 3 : 1,
+                        ),
+                      ),
+                      child: isSelected
+                          ? const Icon(Icons.check, size: 18)
+                          : null,
+                    ),
                   );
                 }).toList(),
               ),
