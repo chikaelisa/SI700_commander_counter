@@ -97,14 +97,43 @@ class PlayerLifeCard extends StatelessWidget {
                 ),
               ),
             ],
-            const Spacer(),
-            Text(
-              '${player.life}',
-              style: Theme.of(
-                context,
-              ).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _LifeTapArea(
+                      onTap: onDecrement,
+                      icon: Icons.remove,
+                      semanticLabel: 'Diminuir vida',
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '${player.life}',
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 72,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _LifeTapArea(
+                      onTap: onIncrement,
+                      icon: Icons.add,
+                      semanticLabel: 'Aumentar vida',
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Align(
               alignment: Alignment.centerLeft,
               child: ManaColorRow(
@@ -112,25 +141,40 @@ class PlayerLifeCard extends StatelessWidget {
                 onAddPressed: onOpenSettings,
               ),
             ),
-            const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.tonal(
-                    onPressed: onDecrement,
-                    child: const Icon(Icons.remove),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: onIncrement,
-                    child: const Icon(Icons.add),
-                  ),
-                ),
-              ],
-            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LifeTapArea extends StatelessWidget {
+  final VoidCallback onTap;
+  final IconData icon;
+  final String semanticLabel;
+
+  const _LifeTapArea({
+    required this.onTap,
+    required this.icon,
+    required this.semanticLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox.expand(
+          child: Center(
+            child: Icon(
+              icon,
+              size: 32,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );

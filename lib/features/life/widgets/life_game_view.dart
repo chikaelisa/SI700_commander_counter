@@ -59,24 +59,45 @@ class LifeGameView extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: GridView.builder(
-                itemCount: players.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: getCrossAxisCount(players.length),
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.85,
-                ),
-                itemBuilder: (context, index) {
-                  return PlayerLifeCard(
-                    player: players[index],
-                    onIncrement: () => onIncrementLife(index),
-                    onDecrement: () => onDecrementLife(index),
-                    onEditName: () => onEditName(index),
-                    canEditCommander: isLoggedIn,
-                    onEditCommander: () => onEditCommander(index),
-                    onOpenSettings: () => onOpenPlayerSettings(index),
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final crossAxisCount = getCrossAxisCount(players.length);
+                  final rowCount = (players.length / crossAxisCount).ceil();
+
+                  const crossAxisSpacing = 8.0;
+                  const mainAxisSpacing = 8.0;
+
+                  final availableWidth =
+                      constraints.maxWidth -
+                      ((crossAxisCount - 1) * crossAxisSpacing);
+                  final availableHeight =
+                      constraints.maxHeight -
+                      ((rowCount - 1) * mainAxisSpacing);
+
+                  final itemWidth = availableWidth / crossAxisCount;
+                  final itemHeight = availableHeight / rowCount;
+
+                  return GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: players.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: crossAxisSpacing,
+                      mainAxisSpacing: mainAxisSpacing,
+                      childAspectRatio: itemWidth / itemHeight,
+                    ),
+                    itemBuilder: (context, index) {
+                      return PlayerLifeCard(
+                        player: players[index],
+                        onIncrement: () => onIncrementLife(index),
+                        onDecrement: () => onDecrementLife(index),
+                        onEditName: () => onEditName(index),
+                        canEditCommander: isLoggedIn,
+                        onEditCommander: () => onEditCommander(index),
+                        onOpenSettings: () => onOpenPlayerSettings(index),
+                      );
+                    },
                   );
                 },
               ),
