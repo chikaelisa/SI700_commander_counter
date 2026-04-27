@@ -1,6 +1,7 @@
 import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
+import 'models/mana_color.dart';
 import 'models/player_life.dart';
 import 'widgets/edit_player_bottom_sheet.dart';
 import 'widgets/life_setup_panel.dart';
@@ -93,6 +94,7 @@ class _LifePageState extends State<LifePage> {
     required int index,
     required String name,
     required String commanderName,
+    required List<ManaColor> manaColors,
   }) {
     final trimmedName = name.trim();
 
@@ -106,6 +108,7 @@ class _LifePageState extends State<LifePage> {
       players[index] = player.copyWith(
         name: trimmedName,
         commanderName: commanderName.trim(),
+        manaColors: manaColors,
       );
     });
   }
@@ -203,13 +206,19 @@ class _LifePageState extends State<LifePage> {
         return EditPlayerBottomSheet(
           player: players[index],
           canEditCommander: widget.isLoggedIn,
-          onSave: ({required String name, required String commanderName}) {
-            updatePlayerSettings(
-              index: index,
-              name: name,
-              commanderName: commanderName,
-            );
-          },
+          onSave:
+              ({
+                required String name,
+                required String commanderName,
+                required List<ManaColor> manaColors,
+              }) {
+                updatePlayerSettings(
+                  index: index,
+                  name: name,
+                  commanderName: commanderName,
+                  manaColors: manaColors,
+                );
+              },
         );
       },
     );

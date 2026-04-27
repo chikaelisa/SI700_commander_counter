@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../models/mana_color.dart';
 import '../models/player_life.dart';
 
 class EditPlayerBottomSheet extends StatefulWidget {
   final PlayerLife player;
   final bool canEditCommander;
+
   final void Function({
     required String name,
     required String commanderName,
-  }) onSave;
+    required List<ManaColor> manaColors,
+  })
+  onSave;
 
   const EditPlayerBottomSheet({
     super.key,
@@ -24,6 +28,7 @@ class EditPlayerBottomSheet extends StatefulWidget {
 class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
   late final TextEditingController nameController;
   late final TextEditingController commanderController;
+  late List<ManaColor> selectedManaColors;
 
   @override
   void initState() {
@@ -33,6 +38,7 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
     commanderController = TextEditingController(
       text: widget.player.commanderName,
     );
+    selectedManaColors = List.of(widget.player.manaColors);
   }
 
   @override
@@ -41,6 +47,16 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
     commanderController.dispose();
 
     super.dispose();
+  }
+
+  void toggleManaColor(ManaColor manaColor) {
+    setState(() {
+      if (selectedManaColors.contains(manaColor)) {
+        selectedManaColors.remove(manaColor);
+      } else {
+        selectedManaColors.add(manaColor);
+      }
+    });
   }
 
   void save() {
@@ -53,6 +69,7 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
     widget.onSave(
       name: name,
       commanderName: commanderController.text.trim(),
+      manaColors: selectedManaColors,
     );
 
     Navigator.of(context).pop();
@@ -88,8 +105,8 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
                 'Configurar jogador',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 32),
               TextField(
@@ -112,6 +129,27 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
                   border: const OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 24),
+              Text(
+                'Identidade de cor',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: ManaColor.values.map((manaColor) {
+                  final isSelected = selectedManaColors.contains(manaColor);
+
+                  return FilterChip(
+                    selected: isSelected,
+                    label: Text('${manaColor.symbol} · ${manaColor.label}'),
+                    onSelected: (_) => toggleManaColor(manaColor),
+                  );
+                }).toList(),
+              ),
               const SizedBox(height: 32),
               OutlinedButton(
                 onPressed: () {
@@ -120,10 +158,7 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
                 child: const Text('Cancelar'),
               ),
               const SizedBox(height: 12),
-              FilledButton(
-                onPressed: save,
-                child: const Text('Salvar'),
-              ),
+              FilledButton(onPressed: save, child: const Text('Salvar')),
             ],
           ),
         ),
