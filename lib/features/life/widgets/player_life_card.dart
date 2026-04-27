@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/player_life.dart';
+import 'mana_color_row.dart';
 
 class PlayerLifeCard extends StatelessWidget {
   final PlayerLife player;
@@ -68,22 +69,21 @@ class PlayerLifeCard extends StatelessWidget {
               ],
             ),
             if (canEditCommander) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               InkWell(
                 onTap: onEditCommander,
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
-                    vertical: 4,
+                    vertical: 2,
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Flexible(
                         child: Text(
                           player.commanderName.isEmpty
-                              ? 'Adicionar comandante'
+                              ? 'Comandante'
                               : player.commanderName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -103,6 +103,14 @@ class PlayerLifeCard extends StatelessWidget {
               style: Theme.of(
                 context,
               ).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ManaColorRow(
+                manaColors: player.manaColors,
+                onAddPressed: onOpenSettings,
+              ),
             ),
             const Spacer(),
             Row(

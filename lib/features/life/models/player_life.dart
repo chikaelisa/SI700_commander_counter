@@ -29,6 +29,7 @@ class PlayerLife {
       life: life ?? this.life,
       commanderName: commanderName ?? this.commanderName,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      manaColors: manaColors ?? this.manaColors,
     );
   }
 }
