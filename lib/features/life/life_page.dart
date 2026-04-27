@@ -5,7 +5,9 @@ import 'models/player_life.dart';
 import 'widgets/life_setup_panel.dart';
 
 class LifePage extends StatefulWidget {
-  const LifePage({super.key});
+  final bool isLoggedIn;
+
+  const LifePage({super.key, required this.isLoggedIn});
 
   @override
   State<LifePage> createState() => _LifePageState();
@@ -90,6 +92,14 @@ class _LifePageState extends State<LifePage> {
     });
   }
 
+  void updateCommanderName(int index, String newCommanderName) {
+    setState(() {
+      final player = players[index];
+
+      players[index] = player.copyWith(commanderName: newCommanderName.trim());
+    });
+  }
+
   Future<void> showEditNameDialog(int index) async {
     final controller = TextEditingController(text: players[index].name);
 
@@ -128,6 +138,92 @@ class _LifePageState extends State<LifePage> {
 
     if (newName != null) {
       updatePlayerName(index, newName);
+    }
+
+    Future<void> showEditCommanderDialog(int index) async {
+      final controller = TextEditingController(
+        text: players[index].commanderName,
+      );
+
+      final newCommanderName = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Editar comandante'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Nome do comandante',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop(controller.text);
+                },
+                child: const Text('Salvar'),
+              ),
+            ],
+          );
+        },
+      );
+
+      controller.dispose();
+
+      if (newCommanderName != null) {
+        updateCommanderName(index, newCommanderName);
+      }
+    }
+  }
+
+  Future<void> showEditCommanderDialog(int index) async {
+    final controller = TextEditingController(
+      text: players[index].commanderName,
+    );
+
+    final newCommanderName = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar comandante'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Nome do comandante',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text);
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (newCommanderName != null) {
+      updateCommanderName(index, newCommanderName);
     }
   }
 
@@ -182,6 +278,8 @@ class _LifePageState extends State<LifePage> {
                     onIncrement: () => incrementLife(index),
                     onDecrement: () => decrementLife(index),
                     onEditName: () => showEditNameDialog(index),
+                    canEditCommander: widget.isLoggedIn,
+                    onEditCommander: () => showEditCommanderDialog(index),
                   );
                 },
               ),

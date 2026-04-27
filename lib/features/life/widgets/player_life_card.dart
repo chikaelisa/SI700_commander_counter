@@ -7,6 +7,8 @@ class PlayerLifeCard extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final VoidCallback onEditName;
+  final bool canEditCommander;
+  final VoidCallback onEditCommander;
 
   const PlayerLifeCard({
     super.key,
@@ -14,6 +16,8 @@ class PlayerLifeCard extends StatelessWidget {
     required this.onIncrement,
     required this.onDecrement,
     required this.onEditName,
+    required this.canEditCommander,
+    required this.onEditCommander,
   });
 
   @override
@@ -47,6 +51,36 @@ class PlayerLifeCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (canEditCommander) ...[
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: onEditCommander,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          player.commanderName.isEmpty
+                              ? 'Adicionar comandante'
+                              : player.commanderName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.edit, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+            ],
             const Spacer(),
             Text(
               '${player.life}',

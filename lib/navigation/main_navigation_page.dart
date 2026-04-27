@@ -52,7 +52,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       isLoggedIn
           ? const CountersPage()
           : AuthRequiredPage(title: 'Counters', onLoginPressed: goToProfile),
-      const LifePage(),
+      LifePage(isLoggedIn: isLoggedIn),
       ProfilePage(isLoggedIn: isLoggedIn, onLogin: login, onLogout: logout),
     ];
 
