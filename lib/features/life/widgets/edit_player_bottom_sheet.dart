@@ -150,7 +150,18 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
 
                   return FilterChip(
                     selected: isSelected,
-                    label: Text('${manaColor.symbol} · ${manaColor.label}'),
+                    avatar: CircleAvatar(
+                      backgroundColor: manaColor.backgroundColor,
+                      child: Text(
+                        manaColor.symbol,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: manaColor.foregroundColor,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    label: Text(manaColor.label),
                     onSelected: (_) => toggleManaColor(manaColor),
                   );
                 }).toList(),

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum ManaColor { white, blue, black, red, green, colorless }
 
 extension ManaColorLabel on ManaColor {
@@ -32,6 +34,38 @@ extension ManaColorLabel on ManaColor {
         return 'Verde';
       case ManaColor.colorless:
         return 'Incolor';
+    }
+  }
+}
+
+extension ManaColorStyle on ManaColor {
+  Color get backgroundColor {
+    switch (this) {
+      case ManaColor.white:
+        return const Color(0xFFF3E8C8);
+      case ManaColor.blue:
+        return const Color(0xFF3B82F6);
+      case ManaColor.black:
+        return const Color(0xFF1F2937);
+      case ManaColor.red:
+        return const Color(0xFFEF4444);
+      case ManaColor.green:
+        return const Color(0xFF22C55E);
+      case ManaColor.colorless:
+        return const Color(0xFFE5E7EB);
+    }
+  }
+
+  Color get foregroundColor {
+    switch (this) {
+      case ManaColor.white:
+      case ManaColor.green:
+      case ManaColor.colorless:
+        return Colors.black;
+      case ManaColor.blue:
+      case ManaColor.black:
+      case ManaColor.red:
+        return Colors.white;
     }
   }
 }

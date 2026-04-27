@@ -38,9 +38,15 @@ class ManaColorPlaceholderBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 12,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        border: Border.all(color: Colors.black, width: 1),
+      ),
+      alignment: Alignment.center,
       child: Icon(
         Icons.add,
         size: 14,
@@ -57,13 +63,28 @@ class ManaColorBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 12,
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: manaColor.backgroundColor,
+        border: Border.all(color: Colors.black, width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
       child: Text(
         manaColor.symbol,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: manaColor.foregroundColor,
+        ),
       ),
     );
   }
