@@ -18,6 +18,7 @@ class LifePage extends StatefulWidget {
 class _LifePageState extends State<LifePage> {
   int playerCount = 4;
   int startingLife = 40;
+  bool isCustomStartingLife = false;
   List<PlayerLife> players = [];
 
   void updatePlayerCount(int value) {
@@ -110,6 +111,12 @@ class _LifePageState extends State<LifePage> {
         commanderName: commanderName.trim(),
         manaColors: manaColors,
       );
+    });
+  }
+
+  void updateCustomStartingLife(bool value) {
+    setState(() {
+      isCustomStartingLife = value;
     });
   }
 
@@ -230,8 +237,10 @@ class _LifePageState extends State<LifePage> {
       return LifeSetupPanel(
         playerCount: playerCount,
         startingLife: startingLife,
+        isCustomStartingLife: isCustomStartingLife,
         onPlayerCountChanged: updatePlayerCount,
         onStartingLifeChanged: updateStartingLife,
+        onCustomStartingLifeChanged: updateCustomStartingLife,
         onCreateGame: createGame,
       );
     }
