@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../../shared/widgets/placeholder_page.dart';
+import '../../shared/widgets/under_development_page.dart';
 
 class GamePage extends StatelessWidget {
-  const GamePage({super.key});
+  final VoidCallback? onGoToLife;
+
+  const GamePage({super.key, this.onGoToLife});
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderPage(title: 'Game');
+    return UnderDevelopmentPage(
+      title: 'Game em desenvolvimento',
+      description:
+          'Nesta área, futuramente você poderá acompanhar partidas salvas, criar mesas e gerenciar dados mais completos do jogo.',
+      icon: Icons.extension_outlined,
+      onPrimaryAction: onGoToLife,
+    );
   }
 }

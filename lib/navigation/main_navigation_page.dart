@@ -43,16 +43,25 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     });
   }
 
+  void goToLife() {
+    setState(() {
+      selectedIndex = 2;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
       isLoggedIn
-          ? const GamePage()
+          ? GamePage(onGoToLife: goToLife)
           : AuthRequiredPage(title: 'Game', onLoginPressed: goToProfile),
+
       isLoggedIn
-          ? const CountersPage()
+          ? CountersPage(onGoToLife: goToLife)
           : AuthRequiredPage(title: 'Counters', onLoginPressed: goToProfile),
+
       LifePage(isLoggedIn: isLoggedIn),
+
       ProfilePage(isLoggedIn: isLoggedIn, onLogin: login, onLogout: logout),
     ];
 
