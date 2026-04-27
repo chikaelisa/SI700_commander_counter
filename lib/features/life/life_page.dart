@@ -1,4 +1,4 @@
-import 'package:commander_counter/features/life/widgets/player_life_card.dart';
+import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
 import 'models/player_life.dart';
@@ -58,18 +58,6 @@ class _LifePageState extends State<LifePage> {
 
       players[index] = player.copyWith(life: player.life - 1);
     });
-  }
-
-  int getCrossAxisCount(int playerCount) {
-    if (playerCount <= 2) {
-      return 1;
-    }
-
-    if (playerCount <= 4) {
-      return 2;
-    }
-
-    return 2;
   }
 
   void resetGame() {
@@ -139,49 +127,6 @@ class _LifePageState extends State<LifePage> {
     if (newName != null) {
       updatePlayerName(index, newName);
     }
-
-    Future<void> showEditCommanderDialog(int index) async {
-      final controller = TextEditingController(
-        text: players[index].commanderName,
-      );
-
-      final newCommanderName = await showDialog<String>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Editar comandante'),
-            content: TextField(
-              controller: controller,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Nome do comandante',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(context).pop(controller.text);
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
-          );
-        },
-      );
-
-      controller.dispose();
-
-      if (newCommanderName != null) {
-        updateCommanderName(index, newCommanderName);
-      }
-    }
   }
 
   Future<void> showEditCommanderDialog(int index) async {
@@ -239,54 +184,14 @@ class _LifePageState extends State<LifePage> {
       );
     }
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: Row(
-              children: [
-                Text(
-                  'Partida',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: resetGame,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reconfigurar'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: GridView.builder(
-                itemCount: players.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: getCrossAxisCount(players.length),
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.85,
-                ),
-                itemBuilder: (context, index) {
-                  return PlayerLifeCard(
-                    player: players[index],
-                    onIncrement: () => incrementLife(index),
-                    onDecrement: () => decrementLife(index),
-                    onEditName: () => showEditNameDialog(index),
-                    canEditCommander: widget.isLoggedIn,
-                    onEditCommander: () => showEditCommanderDialog(index),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+    return LifeGameView(
+      players: players,
+      isLoggedIn: widget.isLoggedIn,
+      onResetGame: resetGame,
+      onIncrementLife: incrementLife,
+      onDecrementLife: decrementLife,
+      onEditName: showEditNameDialog,
+      onEditCommander: showEditCommanderDialog,
     );
   }
 }

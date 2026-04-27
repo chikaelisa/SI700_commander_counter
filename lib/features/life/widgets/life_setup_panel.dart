@@ -42,7 +42,7 @@ class LifeSetupPanel extends StatelessWidget {
             Text('Jogadores', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              value: playerCount,
+              initialValue: playerCount,
               decoration: const InputDecoration(border: OutlineInputBorder()),
               items: playerOptions
                   .map(
@@ -65,7 +65,7 @@ class LifeSetupPanel extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              value: startingLife,
+              initialValue: startingLife,
               decoration: const InputDecoration(border: OutlineInputBorder()),
               items: lifeOptions
                   .map(
