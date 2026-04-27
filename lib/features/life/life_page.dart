@@ -2,6 +2,7 @@ import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
 import 'models/player_life.dart';
+import 'widgets/edit_player_bottom_sheet.dart';
 import 'widgets/life_setup_panel.dart';
 
 class LifePage extends StatefulWidget {
@@ -85,6 +86,27 @@ class _LifePageState extends State<LifePage> {
       final player = players[index];
 
       players[index] = player.copyWith(commanderName: newCommanderName.trim());
+    });
+  }
+
+  void updatePlayerSettings({
+    required int index,
+    required String name,
+    required String commanderName,
+  }) {
+    final trimmedName = name.trim();
+
+    if (trimmedName.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      final player = players[index];
+
+      players[index] = player.copyWith(
+        name: trimmedName,
+        commanderName: commanderName.trim(),
+      );
     });
   }
 
@@ -172,6 +194,27 @@ class _LifePageState extends State<LifePage> {
     }
   }
 
+  Future<void> showEditPlayerBottomSheet(int index) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) {
+        return EditPlayerBottomSheet(
+          player: players[index],
+          canEditCommander: widget.isLoggedIn,
+          onSave: ({required String name, required String commanderName}) {
+            updatePlayerSettings(
+              index: index,
+              name: name,
+              commanderName: commanderName,
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -192,6 +235,7 @@ class _LifePageState extends State<LifePage> {
       onDecrementLife: decrementLife,
       onEditName: showEditNameDialog,
       onEditCommander: showEditCommanderDialog,
+      onOpenPlayerSettings: showEditPlayerBottomSheet,
     );
   }
 }

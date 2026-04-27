@@ -11,6 +11,7 @@ class LifeGameView extends StatelessWidget {
   final void Function(int index) onDecrementLife;
   final void Function(int index) onEditName;
   final void Function(int index) onEditCommander;
+  final void Function(int index) onOpenPlayerSettings;
 
   const LifeGameView({
     super.key,
@@ -21,6 +22,7 @@ class LifeGameView extends StatelessWidget {
     required this.onDecrementLife,
     required this.onEditName,
     required this.onEditCommander,
+    required this.onOpenPlayerSettings,
   });
 
   int getCrossAxisCount(int playerCount) {
@@ -74,6 +76,7 @@ class LifeGameView extends StatelessWidget {
                     onEditName: () => onEditName(index),
                     canEditCommander: isLoggedIn,
                     onEditCommander: () => onEditCommander(index),
+                    onOpenSettings: () => onOpenPlayerSettings(index),
                   );
                 },
               ),

@@ -9,6 +9,7 @@ class PlayerLifeCard extends StatelessWidget {
   final VoidCallback onEditName;
   final bool canEditCommander;
   final VoidCallback onEditCommander;
+  final VoidCallback onOpenSettings;
 
   const PlayerLifeCard({
     super.key,
@@ -18,6 +19,7 @@ class PlayerLifeCard extends StatelessWidget {
     required this.onEditName,
     required this.canEditCommander,
     required this.onEditCommander,
+    required this.onOpenSettings,
   });
 
   @override
@@ -28,28 +30,42 @@ class PlayerLifeCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            InkWell(
-              onTap: onEditName,
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        player.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: onEditName,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              player.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.edit, size: 16),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.edit, size: 16),
-                  ],
+                  ),
                 ),
-              ),
+                IconButton(
+                  onPressed: onOpenSettings,
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: 'Configurar jogador',
+                ),
+              ],
             ),
             if (canEditCommander) ...[
               const SizedBox(height: 8),
