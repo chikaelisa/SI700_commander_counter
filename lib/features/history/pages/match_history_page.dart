@@ -40,7 +40,7 @@ class MatchHistoryCard extends StatelessWidget {
 
     return Card(
       child: ExpansionTile(
-        title: Text('Vencedor: ${match.winnerName}'),
+        title: Text(match.winnerLabel),
         subtitle: Text('$dateText • ${match.playerCount} jogadores'),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
