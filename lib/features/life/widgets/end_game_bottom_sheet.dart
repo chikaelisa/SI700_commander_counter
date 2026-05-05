@@ -5,7 +5,10 @@ import '../models/player_life.dart';
 class EndGameBottomSheet extends StatefulWidget {
   final List<PlayerLife> players;
   final bool isLoggedIn;
-  final void Function({required String? winnerName, required String comment})
+  final Future<void> Function({
+    required String? winnerName,
+    required String comment,
+  })
   onFinishGame;
 
   const EndGameBottomSheet({
@@ -29,17 +32,16 @@ class _EndGameBottomSheetState extends State<EndGameBottomSheet> {
     super.dispose();
   }
 
-  void finishGame() {
+  Future<void> finishGame() async {
     final winnerName = selectedWinnerName == 'no_winner'
         ? null
         : selectedWinnerName;
 
-    widget.onFinishGame(
-      winnerName: winnerName,
-      comment: commentController.text.trim(),
-    );
+    final comment = commentController.text.trim();
 
     Navigator.of(context).pop();
+
+    await widget.onFinishGame(winnerName: winnerName, comment: comment);
   }
 
   @override

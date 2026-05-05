@@ -1,3 +1,5 @@
+import 'package:commander_counter/features/history/models/match_history.dart';
+import 'package:commander_counter/features/history/services/match_history_storage_service.dart';
 import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +24,8 @@ class _LifePageState extends State<LifePage> {
   int startingLife = 40;
   bool isCustomStartingLife = false;
   List<PlayerLife> players = [];
+
+  final matchHistoryStorageService = MatchHistoryStorageService();
 
   void updatePlayerCount(int value) {
     setState(() {
@@ -126,14 +130,40 @@ class _LifePageState extends State<LifePage> {
     });
   }
 
-  void finishGame({required String? winnerName, required String comment}) {
+  Future<void> finishGame({
+    required String? winnerName,
+    required String comment,
+  }) async {
+    if (widget.isLoggedIn) {
+      final matchHistory = MatchHistory(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        playedAt: DateTime.now(),
+        playerCount: players.length,
+        winnerName: winnerName,
+        comment: comment,
+        players: players.map((player) {
+          return MatchPlayerHistory(
+            playerName: player.name,
+            commanderName: player.commanderName,
+            finalLife: player.life,
+          );
+        }).toList(),
+      );
+
+      await matchHistoryStorageService.saveMatch(matchHistory);
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       players = [];
     });
 
-    final message = widget.isLoggedIn && winnerName != null
-        ? 'Partida finalizada. Vencedor: $winnerName'
-        : 'Partida encerrada.';
+    final message = widget.isLoggedIn
+        ? 'Partida salva no histórico local.'
+        : 'Partida encerrada sem salvar.';
 
     ScaffoldMessenger.of(
       context,
@@ -263,8 +293,8 @@ class _LifePageState extends State<LifePage> {
           players: players,
           isLoggedIn: widget.isLoggedIn,
           onFinishGame:
-              ({required String? winnerName, required String comment}) {
-                finishGame(winnerName: winnerName, comment: comment);
+              ({required String? winnerName, required String comment}) async {
+                await finishGame(winnerName: winnerName, comment: comment);
               },
         );
       },

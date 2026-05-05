@@ -58,7 +58,7 @@ final mockMatchHistory = [
     id: '3',
     playedAt: DateTime(2026, 3, 29, 22, 5),
     playerCount: 5,
-    winnerName: 'Nina',
+    winnerName: null,
     comment: 'Partida caótica com muitos counters e politics.',
     players: const [
       MatchPlayerHistory(
