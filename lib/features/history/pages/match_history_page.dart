@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../mock/mock_match_history.dart';
 import '../models/match_history.dart';
 import '../services/match_history_storage_service.dart';
 
@@ -24,19 +23,63 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
   }
 
   Future<List<MatchHistory>> loadMatches() async {
-    final localMatches = await matchHistoryStorageService.getMatches();
-
-    if (localMatches.isEmpty) {
-      return mockMatchHistory;
-    }
-
-    return localMatches;
+    return matchHistoryStorageService.getMatches();
   }
 
   Future<void> refreshMatches() async {
     setState(() {
       matchesFuture = loadMatches();
     });
+  }
+
+  Future<void> deleteMatch(String matchId) async {
+    await matchHistoryStorageService.deleteMatch(matchId);
+
+    if (!mounted) {
+      return;
+    }
+
+    await refreshMatches();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Partida excluída do histórico.')),
+    );
+  }
+
+  Future<void> confirmDeleteMatch(MatchHistory match) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Excluir partida'),
+          content: const Text(
+            'Tem certeza que deseja excluir esta partida do histórico local?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await deleteMatch(match.id);
+    }
   }
 
   @override
@@ -76,7 +119,10 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
             itemBuilder: (context, index) {
               final match = matches[index];
 
-              return MatchHistoryCard(match: match);
+              return MatchHistoryCard(
+                match: match,
+                onDelete: () => confirmDeleteMatch(match),
+              );
             },
           );
         },
@@ -105,8 +151,13 @@ class EmptyMatchHistoryView extends StatelessWidget {
 
 class MatchHistoryCard extends StatelessWidget {
   final MatchHistory match;
+  final VoidCallback onDelete;
 
-  const MatchHistoryCard({super.key, required this.match});
+  const MatchHistoryCard({
+    super.key,
+    required this.match,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +170,11 @@ class MatchHistoryCard extends StatelessWidget {
       child: ExpansionTile(
         title: Text(match.winnerLabel),
         subtitle: Text('$dateText • ${match.playerCount} jogadores'),
+        trailing: IconButton(
+          icon: const Icon(Icons.delete_outline),
+          tooltip: 'Excluir partida',
+          onPressed: onDelete,
+        ),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           if (match.comment.trim().isNotEmpty) ...[
