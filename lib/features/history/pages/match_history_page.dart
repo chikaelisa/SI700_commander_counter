@@ -1,61 +1,85 @@
+import 'package:commander_counter/features/history/bloc/lib/features/history/bloc/match_history_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/match_history_event.dart';
+import '../bloc/match_history_state.dart';
 import '../data/local_match_history_data_provider.dart';
-import '../data/match_history_data_provider.dart';
 import '../models/match_history.dart';
 
-class MatchHistoryPage extends StatefulWidget {
+class MatchHistoryPage extends StatelessWidget {
   const MatchHistoryPage({super.key});
 
   @override
-  State<MatchHistoryPage> createState() => _MatchHistoryPageState();
-}
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider())
+            ..add(const LoadMatchHistory()),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Histórico de partidas')),
+        body: BlocConsumer<MatchHistoryBloc, MatchHistoryState>(
+          listener: (context, state) {
+            if (state is MatchHistoryError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+          builder: (context, state) {
+            if (state is MatchHistoryInitial || state is MatchHistoryLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-class _MatchHistoryPageState extends State<MatchHistoryPage> {
-  final MatchHistoryDataProvider matchHistoryDataProvider =
-      LocalMatchHistoryDataProvider();
+            if (state is MatchHistoryError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    state.message,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              );
+            }
 
-  late Future<List<MatchHistory>> matchesFuture;
+            if (state is MatchHistoryEmpty) {
+              return const EmptyMatchHistoryView();
+            }
 
-  @override
-  void initState() {
-    super.initState();
+            if (state is MatchHistoryLoaded) {
+              return ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.matches.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final match = state.matches[index];
 
-    matchesFuture = loadMatches();
-  }
+                  return MatchHistoryCard(
+                    match: match,
+                    onDelete: () =>
+                        confirmDeleteMatch(context: context, match: match),
+                  );
+                },
+              );
+            }
 
-  Future<List<MatchHistory>> loadMatches() async {
-    return matchHistoryDataProvider.getMatches();
-  }
-
-  Future<void> refreshMatches() async {
-    setState(() {
-      matchesFuture = loadMatches();
-    });
-  }
-
-  Future<void> deleteMatch(String matchId) async {
-    await matchHistoryDataProvider.deleteMatch(matchId);
-
-    if (!mounted) {
-      return;
-    }
-
-    await refreshMatches();
-
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Partida excluída do histórico.')),
+            return const EmptyMatchHistoryView();
+          },
+        ),
+      ),
     );
   }
 
-  Future<void> confirmDeleteMatch(MatchHistory match) async {
+  Future<void> confirmDeleteMatch({
+    required BuildContext context,
+    required MatchHistory match,
+  }) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Excluir partida'),
           content: const Text(
@@ -64,13 +88,13 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Navigator.of(dialogContext).pop(false);
               },
               child: const Text('Cancelar'),
             ),
             FilledButton(
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Navigator.of(dialogContext).pop(true);
               },
               child: const Text('Excluir'),
             ),
@@ -79,57 +103,13 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
       },
     );
 
-    if (shouldDelete == true) {
-      await deleteMatch(match.id);
+    if (shouldDelete == true && context.mounted) {
+      context.read<MatchHistoryBloc>().add(DeleteMatchHistory(match.id));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Partida excluída do histórico.')),
+      );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Histórico de partidas')),
-      body: FutureBuilder<List<MatchHistory>>(
-        future: matchesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'Não foi possível carregar o histórico de partidas.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-            );
-          }
-
-          final matches = snapshot.data ?? [];
-
-          if (matches.isEmpty) {
-            return const EmptyMatchHistoryView();
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: matches.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final match = matches[index];
-
-              return MatchHistoryCard(
-                match: match,
-                onDelete: () => confirmDeleteMatch(match),
-              );
-            },
-          );
-        },
-      ),
-    );
   }
 }
 
