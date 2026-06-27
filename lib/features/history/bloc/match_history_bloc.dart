@@ -14,6 +14,20 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
     on<ClearMatchHistory>(_onClearMatchHistory);
   }
 
+  Future<void> _emitCurrentMatches(
+    Emitter<MatchHistoryState> emit, {
+    String? successMessage,
+  }) async {
+    final matches = await dataProvider.getMatches();
+
+    if (matches.isEmpty) {
+      emit(MatchHistoryEmpty(successMessage: successMessage));
+      return;
+    }
+
+    emit(MatchHistoryLoaded(matches, successMessage: successMessage));
+  }
+
   Future<void> _onLoadMatchHistory(
     LoadMatchHistory event,
     Emitter<MatchHistoryState> emit,
@@ -21,14 +35,7 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
     emit(const MatchHistoryLoading());
 
     try {
-      final matches = await dataProvider.getMatches();
-
-      if (matches.isEmpty) {
-        emit(const MatchHistoryEmpty());
-        return;
-      }
-
-      emit(MatchHistoryLoaded(matches));
+      await _emitCurrentMatches(emit);
     } catch (_) {
       emit(
         const MatchHistoryError(
@@ -44,7 +51,11 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
   ) async {
     try {
       await dataProvider.saveMatch(event.match);
-      add(const LoadMatchHistory());
+
+      await _emitCurrentMatches(
+        emit,
+        successMessage: 'Partida salva no histórico local.',
+      );
     } catch (_) {
       emit(
         const MatchHistoryError(
@@ -60,7 +71,11 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
   ) async {
     try {
       await dataProvider.deleteMatch(event.matchId);
-      add(const LoadMatchHistory());
+
+      await _emitCurrentMatches(
+        emit,
+        successMessage: 'Partida excluída do histórico.',
+      );
     } catch (_) {
       emit(
         const MatchHistoryError(
@@ -76,7 +91,8 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
   ) async {
     try {
       await dataProvider.clearMatches();
-      add(const LoadMatchHistory());
+
+      await _emitCurrentMatches(emit, successMessage: 'Histórico limpo.');
     } catch (_) {
       emit(const MatchHistoryError('Não foi possível limpar o histórico.'));
     }

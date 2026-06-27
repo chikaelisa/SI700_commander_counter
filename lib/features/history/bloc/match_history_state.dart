@@ -14,12 +14,15 @@ class MatchHistoryLoading extends MatchHistoryState {
 
 class MatchHistoryLoaded extends MatchHistoryState {
   final List<MatchHistory> matches;
+  final String? successMessage;
 
-  const MatchHistoryLoaded(this.matches);
+  const MatchHistoryLoaded(this.matches, {this.successMessage});
 }
 
 class MatchHistoryEmpty extends MatchHistoryState {
-  const MatchHistoryEmpty();
+  final String? successMessage;
+
+  const MatchHistoryEmpty({this.successMessage});
 }
 
 class MatchHistoryError extends MatchHistoryState {

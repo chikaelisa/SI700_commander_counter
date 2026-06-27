@@ -1,7 +1,10 @@
 import 'package:commander_counter/features/counters/counters_page.dart';
 import 'package:commander_counter/features/game/game_page.dart';
+import 'package:commander_counter/features/history/bloc/match_history_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../features/history/data/local_match_history_data_provider.dart';
 import '../features/life/life_page.dart';
 import '../features/profile/profile_page.dart';
 import '../shared/widgets/auth_required_page.dart';
@@ -65,11 +68,15 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ProfilePage(isLoggedIn: isLoggedIn, onLogin: login, onLogout: logout),
     ];
 
-    return Scaffold(
-      body: IndexedStack(index: selectedIndex, children: pages),
-      bottomNavigationBar: AppBottomNavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: onItemTapped,
+    return BlocProvider(
+      create: (context) =>
+          MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider()),
+      child: Scaffold(
+        body: IndexedStack(index: selectedIndex, children: pages),
+        bottomNavigationBar: AppBottomNavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: onItemTapped,
+        ),
       ),
     );
   }

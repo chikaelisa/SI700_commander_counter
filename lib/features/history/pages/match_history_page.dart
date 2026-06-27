@@ -1,4 +1,4 @@
-import 'package:commander_counter/features/history/bloc/lib/features/history/bloc/match_history_bloc.dart';
+import 'package:commander_counter/features/history/bloc/match_history_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -24,6 +24,22 @@ class MatchHistoryPage extends StatelessWidget {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(state.message)));
+
+              return;
+            }
+
+            if (state is MatchHistoryLoaded && state.successMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+
+              return;
+            }
+
+            if (state is MatchHistoryEmpty && state.successMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
             }
           },
           builder: (context, state) {
@@ -105,10 +121,6 @@ class MatchHistoryPage extends StatelessWidget {
 
     if (shouldDelete == true && context.mounted) {
       context.read<MatchHistoryBloc>().add(DeleteMatchHistory(match.id));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Partida excluída do histórico.')),
-      );
     }
   }
 }
