@@ -1,8 +1,9 @@
 import 'package:commander_counter/features/history/models/match_history.dart';
-import 'package:commander_counter/features/history/services/match_history_storage_service.dart';
 import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
 
+import '../history/data/local_match_history_data_provider.dart';
+import '../history/data/match_history_data_provider.dart';
 import 'constants/player_card_colors.dart';
 import 'models/mana_color.dart';
 import 'models/player_life.dart';
@@ -25,7 +26,8 @@ class _LifePageState extends State<LifePage> {
   bool isCustomStartingLife = false;
   List<PlayerLife> players = [];
 
-  final matchHistoryStorageService = MatchHistoryStorageService();
+  final MatchHistoryDataProvider matchHistoryDataProvider =
+      LocalMatchHistoryDataProvider();
 
   void updatePlayerCount(int value) {
     setState(() {
@@ -150,7 +152,7 @@ class _LifePageState extends State<LifePage> {
         }).toList(),
       );
 
-      await matchHistoryStorageService.saveMatch(matchHistory);
+      await matchHistoryDataProvider.saveMatch(matchHistory);
     }
 
     if (!mounted) {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../data/local_match_history_data_provider.dart';
+import '../data/match_history_data_provider.dart';
 import '../models/match_history.dart';
-import '../services/match_history_storage_service.dart';
 
 class MatchHistoryPage extends StatefulWidget {
   const MatchHistoryPage({super.key});
@@ -11,7 +12,8 @@ class MatchHistoryPage extends StatefulWidget {
 }
 
 class _MatchHistoryPageState extends State<MatchHistoryPage> {
-  final matchHistoryStorageService = MatchHistoryStorageService();
+  final MatchHistoryDataProvider matchHistoryDataProvider =
+      LocalMatchHistoryDataProvider();
 
   late Future<List<MatchHistory>> matchesFuture;
 
@@ -23,7 +25,7 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
   }
 
   Future<List<MatchHistory>> loadMatches() async {
-    return matchHistoryStorageService.getMatches();
+    return matchHistoryDataProvider.getMatches();
   }
 
   Future<void> refreshMatches() async {
@@ -33,7 +35,7 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
   }
 
   Future<void> deleteMatch(String matchId) async {
-    await matchHistoryStorageService.deleteMatch(matchId);
+    await matchHistoryDataProvider.deleteMatch(matchId);
 
     if (!mounted) {
       return;
