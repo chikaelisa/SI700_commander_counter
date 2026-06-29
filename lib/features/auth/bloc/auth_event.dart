@@ -1,0 +1,26 @@
+sealed class AuthEvent {
+  const AuthEvent();
+}
+
+class AuthSignInRequested extends AuthEvent {
+  final String email;
+  final String password;
+
+  const AuthSignInRequested({required this.email, required this.password});
+}
+
+class AuthSignUpRequested extends AuthEvent {
+  final String name;
+  final String email;
+  final String password;
+
+  const AuthSignUpRequested({
+    required this.name,
+    required this.email,
+    required this.password,
+  });
+}
+
+class AuthSignOutRequested extends AuthEvent {
+  const AuthSignOutRequested();
+}
