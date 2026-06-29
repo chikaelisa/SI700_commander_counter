@@ -1,9 +1,12 @@
 import 'package:commander_counter/features/history/models/match_history.dart';
 import 'package:commander_counter/features/life/widgets/life_game_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../history/bloc/match_history_bloc.dart';
+import '../history/bloc/match_history_event.dart';
+import '../history/bloc/match_history_state.dart';
 import '../history/data/local_match_history_data_provider.dart';
-import '../history/data/match_history_data_provider.dart';
 import 'constants/player_card_colors.dart';
 import 'models/mana_color.dart';
 import 'models/player_life.dart';
@@ -26,8 +29,15 @@ class _LifePageState extends State<LifePage> {
   bool isCustomStartingLife = false;
   List<PlayerLife> players = [];
 
-  final MatchHistoryDataProvider matchHistoryDataProvider =
-      LocalMatchHistoryDataProvider();
+  late final MatchHistoryBloc matchHistoryBloc = MatchHistoryBloc(
+    dataProvider: LocalMatchHistoryDataProvider(),
+  );
+
+  @override
+  void dispose() {
+    matchHistoryBloc.close();
+    super.dispose();
+  }
 
   void updatePlayerCount(int value) {
     setState(() {
@@ -136,40 +146,38 @@ class _LifePageState extends State<LifePage> {
     required String? winnerName,
     required String comment,
   }) async {
-    if (widget.isLoggedIn) {
-      final matchHistory = MatchHistory(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        playedAt: DateTime.now(),
-        playerCount: players.length,
-        winnerName: winnerName,
-        comment: comment,
-        players: players.map((player) {
-          return MatchPlayerHistory(
-            playerName: player.name,
-            commanderName: player.commanderName,
-            finalLife: player.life,
-          );
-        }).toList(),
+    if (!widget.isLoggedIn) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        players = [];
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Partida encerrada sem salvar.')),
       );
 
-      await matchHistoryDataProvider.saveMatch(matchHistory);
-    }
-
-    if (!mounted) {
       return;
     }
 
-    setState(() {
-      players = [];
-    });
+    final matchHistory = MatchHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      playedAt: DateTime.now(),
+      playerCount: players.length,
+      winnerName: winnerName,
+      comment: comment,
+      players: players.map((player) {
+        return MatchPlayerHistory(
+          playerName: player.name,
+          commanderName: player.commanderName,
+          finalLife: player.life,
+        );
+      }).toList(),
+    );
 
-    final message = widget.isLoggedIn
-        ? 'Partida salva no histórico local.'
-        : 'Partida encerrada sem salvar.';
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    matchHistoryBloc.add(SaveMatchHistory(matchHistory));
   }
 
   Future<void> showEditNameDialog(int index) async {
@@ -305,6 +313,46 @@ class _LifePageState extends State<LifePage> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: matchHistoryBloc,
+      child: BlocListener<MatchHistoryBloc, MatchHistoryState>(
+        listener: (context, state) {
+          if (state is MatchHistoryError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+
+            return;
+          }
+
+          if (state is MatchHistoryLoaded && state.successMessage != null) {
+            setState(() {
+              players = [];
+            });
+
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+
+            return;
+          }
+
+          if (state is MatchHistoryEmpty && state.successMessage != null) {
+            setState(() {
+              players = [];
+            });
+
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+          }
+        },
+        child: _buildLifeContent(),
+      ),
+    );
+  }
+
+  Widget _buildLifeContent() {
     if (players.isEmpty) {
       return LifeSetupPanel(
         playerCount: playerCount,
