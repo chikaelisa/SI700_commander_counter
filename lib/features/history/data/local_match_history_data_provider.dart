@@ -24,10 +24,7 @@ class LocalMatchHistoryDataProvider implements MatchHistoryDataProvider {
     final preferences = await SharedPreferences.getInstance();
     final matches = await getMatches();
 
-    final updatedMatches = [
-      match,
-      ...matches,
-    ];
+    final updatedMatches = [match, ...matches];
 
     final matchesJson = updatedMatches.map((match) {
       return jsonEncode(match.toJson());
@@ -56,5 +53,35 @@ class LocalMatchHistoryDataProvider implements MatchHistoryDataProvider {
   Future<void> clearMatches() async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
+  }
+
+  @override
+  Future<void> updateMatchComment({
+    required String matchId,
+    required String comment,
+  }) async {
+    final preferences = await SharedPreferences.getInstance();
+    final matches = await getMatches();
+
+    final updatedMatches = matches.map((match) {
+      if (match.id != matchId) {
+        return match;
+      }
+
+      return MatchHistory(
+        id: match.id,
+        playedAt: match.playedAt,
+        playerCount: match.playerCount,
+        winnerName: match.winnerName,
+        comment: comment,
+        players: match.players,
+      );
+    }).toList();
+
+    final matchesJson = updatedMatches.map((match) {
+      return jsonEncode(match.toJson());
+    }).toList();
+
+    await preferences.setStringList(_storageKey, matchesJson);
   }
 }

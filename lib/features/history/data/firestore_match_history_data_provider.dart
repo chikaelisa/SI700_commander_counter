@@ -57,4 +57,15 @@ class FirestoreMatchHistoryDataProvider implements MatchHistoryDataProvider {
 
     await batch.commit();
   }
+
+  @override
+  Future<void> updateMatchComment({
+    required String matchId,
+    required String comment,
+  }) async {
+    await _matchesCollection().doc(matchId).update({
+      'comment': comment,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

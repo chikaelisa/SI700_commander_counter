@@ -14,6 +14,13 @@ class SaveMatchHistory extends MatchHistoryEvent {
   const SaveMatchHistory(this.match);
 }
 
+class UpdateMatchComment extends MatchHistoryEvent {
+  final String matchId;
+  final String comment;
+
+  const UpdateMatchComment({required this.matchId, required this.comment});
+}
+
 class DeleteMatchHistory extends MatchHistoryEvent {
   final String matchId;
 

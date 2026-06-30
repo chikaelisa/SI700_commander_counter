@@ -5,6 +5,11 @@ abstract class MatchHistoryDataProvider {
 
   Future<void> saveMatch(MatchHistory match);
 
+  Future<void> updateMatchComment({
+    required String matchId,
+    required String comment,
+  });
+
   Future<void> deleteMatch(String matchId);
 
   Future<void> clearMatches();

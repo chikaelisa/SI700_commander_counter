@@ -69,15 +69,6 @@ class ProfileLoggedInView extends StatelessWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text('Meus dados'),
-              subtitle: const Text('Visualizar informações da conta'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-          ),
-          Card(
-            child: ListTile(
               leading: const Icon(Icons.history),
               title: const Text('Histórico de partidas'),
               subtitle: const Text('Ver partidas salvas'),

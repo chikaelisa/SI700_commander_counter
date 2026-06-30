@@ -81,6 +81,8 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
 
                 return MatchHistoryCard(
                   match: match,
+                  onEditComment: () =>
+                      editMatchComment(context: context, match: match),
                   onDelete: () =>
                       confirmDeleteMatch(context: context, match: match),
                 );
@@ -104,7 +106,7 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
         return AlertDialog(
           title: const Text('Excluir partida'),
           content: const Text(
-            'Tem certeza que deseja excluir esta partida do histórico local?',
+            'Tem certeza que deseja excluir esta partida do histórico?',
           ),
           actions: [
             TextButton(
@@ -126,6 +128,53 @@ class _MatchHistoryPageState extends State<MatchHistoryPage> {
 
     if (shouldDelete == true && context.mounted) {
       context.read<MatchHistoryBloc>().add(DeleteMatchHistory(match.id));
+    }
+  }
+
+  Future<void> editMatchComment({
+    required BuildContext context,
+    required MatchHistory match,
+  }) async {
+    final controller = TextEditingController(text: match.comment);
+
+    final newComment = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Editar comentário'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              labelText: 'Comentário',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(controller.text);
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (newComment != null && context.mounted) {
+      context.read<MatchHistoryBloc>().add(
+        UpdateMatchComment(matchId: match.id, comment: newComment.trim()),
+      );
     }
   }
 }
@@ -151,11 +200,13 @@ class EmptyMatchHistoryView extends StatelessWidget {
 class MatchHistoryCard extends StatelessWidget {
   final MatchHistory match;
   final VoidCallback onDelete;
+  final VoidCallback onEditComment;
 
   const MatchHistoryCard({
     super.key,
     required this.match,
     required this.onDelete,
+    required this.onEditComment,
   });
 
   @override
@@ -169,10 +220,20 @@ class MatchHistoryCard extends StatelessWidget {
       child: ExpansionTile(
         title: Text(match.winnerLabel),
         subtitle: Text('$dateText • ${match.playerCount} jogadores'),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
-          tooltip: 'Excluir partida',
-          onPressed: onDelete,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Editar comentário',
+              onPressed: onEditComment,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Excluir partida',
+              onPressed: onDelete,
+            ),
+          ],
         ),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [

@@ -12,6 +12,7 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
     on<SaveMatchHistory>(_onSaveMatchHistory);
     on<DeleteMatchHistory>(_onDeleteMatchHistory);
     on<ClearMatchHistory>(_onClearMatchHistory);
+    on<UpdateMatchComment>(_onUpdateMatchComment);
   }
 
   Future<void> _emitCurrentMatches(
@@ -54,7 +55,7 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
 
       await _emitCurrentMatches(
         emit,
-        successMessage: 'Partida salva no histórico local.',
+        successMessage: 'Partida salva no histórico.',
       );
     } catch (_) {
       emit(
@@ -95,6 +96,22 @@ class MatchHistoryBloc extends Bloc<MatchHistoryEvent, MatchHistoryState> {
       await _emitCurrentMatches(emit, successMessage: 'Histórico limpo.');
     } catch (_) {
       emit(const MatchHistoryError('Não foi possível limpar o histórico.'));
+    }
+  }
+
+  Future<void> _onUpdateMatchComment(
+    UpdateMatchComment event,
+    Emitter<MatchHistoryState> emit,
+  ) async {
+    try {
+      await dataProvider.updateMatchComment(
+        matchId: event.matchId,
+        comment: event.comment,
+      );
+
+      await _emitCurrentMatches(emit, successMessage: 'Comentário atualizado.');
+    } catch (_) {
+      emit(const MatchHistoryError('Não foi possível atualizar o comentário.'));
     }
   }
 }
