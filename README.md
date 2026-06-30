@@ -164,11 +164,71 @@ Cada item de `players` terá:
 | `finalLife`         | number         | Vida final do jogador            |
 | `manaColors`        | array<string>  | Identidade de mana do comandante |
 
-## Regras de segurança planejadas
+## Integração com Firebase
 
-A ideia é garantir que cada usuário só consiga acessar os próprios dados.
+O app usa Firebase para autenticação real e persistência remota dos dados do usuário.
 
-Regras planejadas para o Firestore:
+### Firebase Authentication
+
+A autenticação é feita com Firebase Authentication usando e-mail e senha.
+
+Fluxos implementados:
+
+- Cadastro com nome, e-mail e senha.
+- Login com e-mail e senha.
+- Logout.
+- Exibição dos dados reais do usuário autenticado no perfil.
+
+No cadastro, o Firebase Authentication cria o usuário e gera um `uid`. Esse `uid` é usado como identificador principal do usuário no Firestore.
+
+### Cloud Firestore
+
+O Cloud Firestore é usado para armazenar os dados complementares do perfil e o histórico de partidas.
+
+Estrutura implementada:
+
+```text
+users
+  {uid}
+    name: string
+    email: string
+    createdAt: timestamp
+    updatedAt: timestamp
+
+    matches
+      {matchId}
+        playedAt: timestamp
+        playerCount: number
+        winnerName: string | null
+        comment: string
+        createdAt: timestamp
+        updatedAt: timestamp
+        players: array
+          [
+            {
+              playerName: string
+              commanderName: string
+              finalLife: number
+            }
+          ]
+```
+
+### CRUD do histórico
+
+O histórico de partidas possui operações completas de CRUD:
+
+| Operação | Implementação                                               |
+| -------- | ----------------------------------------------------------- |
+| Create   | Salvar partida encerrada em `users/{uid}/matches/{matchId}` |
+| Read     | Listar partidas salvas do usuário autenticado               |
+| Update   | Editar comentário de uma partida salva                      |
+| Delete   | Excluir partida salva                                       |
+
+O histórico é sempre associado ao usuário logado, usando o `uid` do Firebase Authentication.
+
+### Regras de segurança do Firestore
+
+As regras planejadas/implementadas garantem que cada usuário só possa acessar os próprios dados:
 
 ```js
 rules_version = '2';
@@ -188,56 +248,9 @@ service cloud.firestore {
 }
 ```
 
-Essas regras impedem que um usuário autenticado leia ou altere dados de outro usuário.
+## Arquitetura atual com Firebase
 
-## Estratégia de implementação Firebase
-
-A integração será feita em etapas:
-
-1. Configurar Firebase no projeto Flutter.
-2. Substituir `MockAuthDataProvider` por `FirebaseAuthDataProvider`.
-3. Criar o documento `users/{uid}` no cadastro.
-4. Buscar dados de `users/{uid}` no login.
-5. Exibir nome e e-mail reais no perfil.
-6. Substituir `LocalMatchHistoryDataProvider` por `FirestoreMatchHistoryDataProvider`.
-7. Salvar partidas em `users/{uid}/matches`.
-8. Listar apenas as partidas do usuário autenticado.
-9. Permitir exclusão e edição de comentário no Firestore.
-10. Integrar API externa de cartas para buscar comandantes e imagens.
-
-## Justificativa técnica
-
-Essa estrutura foi escolhida para manter os dados de cada usuário isolados e facilitar a apresentação do projeto.
-
-O Firebase Authentication será responsável pela identidade do usuário. O Cloud Firestore armazenará os dados complementares do perfil e o histórico de partidas.
-
-A separação planejada é:
-
-```text
-Firebase Authentication
-  - e-mail
-  - senha
-  - uid
-
-Cloud Firestore
-  - nome do usuário
-  - dados de perfil
-  - histórico de partidas
-  - jogadores de cada partida
-  - dados dos comandantes
-```
-
-Com isso, o app consegue demonstrar:
-
-- autenticação real;
-- dados persistentes;
-- dados separados por usuário;
-- armazenamento visível no Firebase Console;
-- estrutura compatível com a arquitetura em camadas do projeto.
-
-## Relação com a arquitetura do app
-
-A integração com Firebase seguirá a arquitetura atual do projeto:
+A integração com Firebase segue a arquitetura em camadas do projeto:
 
 ```text
 Interface Gráfica
@@ -246,16 +259,17 @@ Interface Gráfica
       → Firebase
 ```
 
-Exemplo para autenticação:
+### Autenticação
 
 ```text
 ProfilePage / SignInView / SignUpView
   → AuthBloc
     → FirebaseAuthDataProvider
-      → Firebase Authentication + Firestore users/{uid}
+      → Firebase Authentication
+      → Firestore users/{uid}
 ```
 
-Exemplo para histórico:
+### Histórico
 
 ```text
 LifePage / MatchHistoryPage
@@ -264,4 +278,4 @@ LifePage / MatchHistoryPage
       → Firestore users/{uid}/matches/{matchId}
 ```
 
-Essa organização permite trocar a implementação dos dados sem reescrever as telas principais.
+Essa separação permite trocar a origem dos dados sem reescrever as telas principais.
