@@ -103,19 +103,28 @@ class MatchHistory {
 class MatchPlayerHistory {
   final String playerName;
   final String commanderName;
+  final String? commanderCardId;
+  final String? commanderImageUrl;
   final int finalLife;
+  final List<String> manaColors;
 
   const MatchPlayerHistory({
     required this.playerName,
     required this.commanderName,
     required this.finalLife,
+    this.commanderCardId,
+    this.commanderImageUrl,
+    this.manaColors = const [],
   });
 
   Map<String, dynamic> toJson() {
     return {
       'playerName': playerName,
       'commanderName': commanderName,
+      'commanderCardId': commanderCardId,
+      'commanderImageUrl': commanderImageUrl,
       'finalLife': finalLife,
+      'manaColors': manaColors,
     };
   }
 
@@ -123,7 +132,12 @@ class MatchPlayerHistory {
     return MatchPlayerHistory(
       playerName: json['playerName'] as String? ?? '',
       commanderName: json['commanderName'] as String? ?? '',
+      commanderCardId: json['commanderCardId'] as String?,
+      commanderImageUrl: json['commanderImageUrl'] as String?,
       finalLife: json['finalLife'] as int? ?? 0,
+      manaColors: (json['manaColors'] as List<dynamic>? ?? [])
+          .map((manaColor) => manaColor as String)
+          .toList(),
     );
   }
 }

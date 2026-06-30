@@ -104,6 +104,8 @@ class _LifePageState extends State<LifePage> {
     required int index,
     required String name,
     required String commanderName,
+    required String? commanderCardId,
+    required String? commanderImageUrl,
     required List<ManaColor> manaColors,
     required Color backgroundColor,
   }) {
@@ -119,6 +121,8 @@ class _LifePageState extends State<LifePage> {
       players[index] = player.copyWith(
         name: trimmedName,
         commanderName: commanderName.trim(),
+        commanderCardId: commanderCardId,
+        commanderImageUrl: commanderImageUrl,
         manaColors: manaColors,
         backgroundColor: backgroundColor,
       );
@@ -161,7 +165,12 @@ class _LifePageState extends State<LifePage> {
         return MatchPlayerHistory(
           playerName: player.name,
           commanderName: player.commanderName,
+          commanderCardId: player.commanderCardId,
+          commanderImageUrl: player.commanderImageUrl,
           finalLife: player.life,
+          manaColors: player.manaColors.map((manaColor) {
+            return manaColor.symbol;
+          }).toList(),
         );
       }).toList(),
     );
@@ -266,6 +275,8 @@ class _LifePageState extends State<LifePage> {
               ({
                 required String name,
                 required String commanderName,
+                required String? commanderCardId,
+                required String? commanderImageUrl,
                 required List<ManaColor> manaColors,
                 required Color backgroundColor,
               }) {
@@ -273,6 +284,8 @@ class _LifePageState extends State<LifePage> {
                   index: index,
                   name: name,
                   commanderName: commanderName,
+                  commanderCardId: commanderCardId,
+                  commanderImageUrl: commanderImageUrl,
                   manaColors: manaColors,
                   backgroundColor: backgroundColor,
                 );

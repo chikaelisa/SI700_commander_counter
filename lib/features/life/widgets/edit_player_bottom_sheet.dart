@@ -13,6 +13,8 @@ class EditPlayerBottomSheet extends StatefulWidget {
   final void Function({
     required String name,
     required String commanderName,
+    required String? commanderCardId,
+    required String? commanderImageUrl,
     required List<ManaColor> manaColors,
     required Color backgroundColor,
   })
@@ -34,6 +36,8 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
   late final TextEditingController commanderController;
   late Color selectedBackgroundColor;
   late List<ManaColor> selectedManaColors;
+  String? selectedCommanderCardId;
+  String? selectedCommanderImageUrl;
 
   @override
   void initState() {
@@ -45,6 +49,8 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
     );
     selectedManaColors = List.of(widget.player.manaColors);
     selectedBackgroundColor = widget.player.backgroundColor;
+    selectedCommanderCardId = widget.player.commanderCardId;
+    selectedCommanderImageUrl = widget.player.commanderImageUrl;
   }
 
   @override
@@ -68,6 +74,8 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
   void selectCommanderCard(MagicCard card) {
     setState(() {
       commanderController.text = card.name;
+      selectedCommanderCardId = card.id;
+      selectedCommanderImageUrl = card.imageUrl;
       selectedManaColors = card.colorIdentity
           .map(manaColorFromSymbol)
           .whereType<ManaColor>()
@@ -89,10 +97,11 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
     widget.onSave(
       name: name,
       commanderName: commanderController.text.trim(),
+      commanderCardId: selectedCommanderCardId,
+      commanderImageUrl: selectedCommanderImageUrl,
       manaColors: selectedManaColors,
       backgroundColor: selectedBackgroundColor,
     );
-
     Navigator.of(context).pop();
   }
 
@@ -142,6 +151,10 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
               TextField(
                 controller: commanderController,
                 enabled: widget.canEditCommander,
+                onChanged: (_) {
+                  selectedCommanderCardId = null;
+                  selectedCommanderImageUrl = null;
+                },
                 decoration: InputDecoration(
                   labelText: 'Comandante',
                   helperText: widget.canEditCommander
