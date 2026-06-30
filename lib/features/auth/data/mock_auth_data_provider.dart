@@ -9,7 +9,7 @@ class MockAuthDataProvider implements AuthDataProvider {
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
 
-    return AppUser(name: 'Usuário Commander', email: email);
+    return AppUser(id: 'mock-user-id', name: 'Usuário Commander', email: email);
   }
 
   @override
@@ -20,7 +20,7 @@ class MockAuthDataProvider implements AuthDataProvider {
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
 
-    return AppUser(name: name, email: email);
+    return AppUser(id: 'mock-user-id', name: name, email: email);
   }
 
   @override
