@@ -1,3 +1,5 @@
+import 'package:commander_counter/features/cards/bloc/card_search_bloc.dart';
+import 'package:commander_counter/features/cards/data/scryfall_card_search_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -33,6 +35,10 @@ class CommanderCounterApp extends StatelessWidget {
             dataProvider:
                 matchHistoryDataProvider ?? FirestoreMatchHistoryDataProvider(),
           ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              CardSearchBloc(dataProvider: ScryfallCardSearchDataProvider()),
         ),
       ],
       child: MaterialApp(
