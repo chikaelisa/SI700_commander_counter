@@ -2,11 +2,9 @@ import 'package:commander_counter/features/auth/bloc/auth_bloc.dart';
 import 'package:commander_counter/features/auth/bloc/auth_state.dart';
 import 'package:commander_counter/features/counters/counters_page.dart';
 import 'package:commander_counter/features/game/game_page.dart';
-import 'package:commander_counter/features/history/bloc/match_history_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../features/history/data/local_match_history_data_provider.dart';
 import '../features/life/life_page.dart';
 import '../features/profile/profile_page.dart';
 import '../shared/widgets/auth_required_page.dart';
@@ -49,25 +47,18 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       isLoggedIn
           ? GamePage(onGoToLife: goToLife)
           : AuthRequiredPage(title: 'Game', onLoginPressed: goToProfile),
-
       isLoggedIn
           ? CountersPage(onGoToLife: goToLife)
           : AuthRequiredPage(title: 'Counters', onLoginPressed: goToProfile),
-
       LifePage(isLoggedIn: isLoggedIn),
-
-      ProfilePage(),
+      const ProfilePage(),
     ];
 
-    return BlocProvider(
-      create: (context) =>
-          MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider()),
-      child: Scaffold(
-        body: IndexedStack(index: selectedIndex, children: pages),
-        bottomNavigationBar: AppBottomNavigationBar(
-          selectedIndex: selectedIndex,
-          onDestinationSelected: onItemTapped,
-        ),
+    return Scaffold(
+      body: IndexedStack(index: selectedIndex, children: pages),
+      bottomNavigationBar: AppBottomNavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: onItemTapped,
       ),
     );
   }
