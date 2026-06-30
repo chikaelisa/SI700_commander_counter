@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/match_history_event.dart';
 import '../bloc/match_history_state.dart';
-import '../data/local_match_history_data_provider.dart';
 import '../models/match_history.dart';
 
 class MatchHistoryPage extends StatelessWidget {
@@ -12,79 +11,75 @@ class MatchHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider())
-            ..add(const LoadMatchHistory()),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Histórico de partidas')),
-        body: BlocConsumer<MatchHistoryBloc, MatchHistoryState>(
-          listener: (context, state) {
-            if (state is MatchHistoryError) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message)));
+    context.read<MatchHistoryBloc>().add(const LoadMatchHistory());
 
-              return;
-            }
+    return Scaffold(
+      appBar: AppBar(title: const Text('Histórico de partidas')),
+      body: BlocConsumer<MatchHistoryBloc, MatchHistoryState>(
+        listener: (context, state) {
+          if (state is MatchHistoryError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
 
-            if (state is MatchHistoryLoaded && state.successMessage != null) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+            return;
+          }
 
-              return;
-            }
+          if (state is MatchHistoryLoaded && state.successMessage != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
 
-            if (state is MatchHistoryEmpty && state.successMessage != null) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
-            }
-          },
-          builder: (context, state) {
-            if (state is MatchHistoryInitial || state is MatchHistoryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+            return;
+          }
 
-            if (state is MatchHistoryError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    state.message,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+          if (state is MatchHistoryEmpty && state.successMessage != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+          }
+        },
+        builder: (context, state) {
+          if (state is MatchHistoryInitial || state is MatchHistoryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is MatchHistoryError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  state.message,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              );
-            }
+              ),
+            );
+          }
 
-            if (state is MatchHistoryEmpty) {
-              return const EmptyMatchHistoryView();
-            }
-
-            if (state is MatchHistoryLoaded) {
-              return ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: state.matches.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final match = state.matches[index];
-
-                  return MatchHistoryCard(
-                    match: match,
-                    onDelete: () =>
-                        confirmDeleteMatch(context: context, match: match),
-                  );
-                },
-              );
-            }
-
+          if (state is MatchHistoryEmpty) {
             return const EmptyMatchHistoryView();
-          },
-        ),
+          }
+
+          if (state is MatchHistoryLoaded) {
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.matches.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final match = state.matches[index];
+
+                return MatchHistoryCard(
+                  match: match,
+                  onDelete: () =>
+                      confirmDeleteMatch(context: context, match: match),
+                );
+              },
+            );
+          }
+
+          return const EmptyMatchHistoryView();
+        },
       ),
     );
   }
