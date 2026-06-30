@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-class SignInView extends StatelessWidget {
-  final VoidCallback onSignIn;
+class SignInView extends StatefulWidget {
+  final void Function({required String email, required String password})
+  onSignIn;
+
   final VoidCallback onGoToSignUp;
 
   const SignInView({
@@ -9,6 +11,36 @@ class SignInView extends StatelessWidget {
     required this.onSignIn,
     required this.onGoToSignUp,
   });
+
+  @override
+  State<SignInView> createState() => _SignInViewState();
+}
+
+class _SignInViewState extends State<SignInView> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void submit() {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Informe e-mail e senha.')));
+
+      return;
+    }
+
+    widget.onSignIn(email: email, password: password);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +58,19 @@ class SignInView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
                     labelText: 'E-mail',
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const TextField(
+                TextField(
+                  controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Senha',
                     border: OutlineInputBorder(),
                   ),
@@ -44,13 +79,13 @@ class SignInView extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: onSignIn,
-                    child: Text('Entrar'),
+                    onPressed: submit,
+                    child: const Text('Entrar'),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: onGoToSignUp,
+                  onPressed: widget.onGoToSignUp,
                   child: const Text('Criar conta'),
                 ),
               ],

@@ -24,22 +24,19 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  void signIn() {
+  void signIn({required String email, required String password}) {
     context.read<AuthBloc>().add(
-      const AuthSignInRequested(
-        email: 'user@commander-counter.local',
-        password: 'password',
-      ),
+      AuthSignInRequested(email: email, password: password),
     );
   }
 
-  void signUp() {
+  void signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) {
     context.read<AuthBloc>().add(
-      const AuthSignUpRequested(
-        name: 'Usuário Commander',
-        email: 'user@commander-counter.local',
-        password: 'password',
-      ),
+      AuthSignUpRequested(name: name, email: email, password: password),
     );
   }
 
@@ -55,6 +52,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+
+        if (state is AuthAuthenticated) {
+          setState(() {
+            isSignUpMode = false;
+          });
         }
       },
       builder: (context, state) {
