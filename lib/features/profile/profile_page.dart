@@ -66,9 +66,12 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         if (state is AuthAuthenticated) {
-          return ProfileLoggedInView(onLogout: signOut);
+          return ProfileLoggedInView(
+            userName: state.user.name,
+            userEmail: state.user.email,
+            onLogout: signOut,
+          );
         }
-
         if (isSignUpMode) {
           return SignUpView(onSignUp: signUp, onGoToSignIn: toggleMode);
         }
