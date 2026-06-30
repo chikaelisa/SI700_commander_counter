@@ -1,3 +1,5 @@
+import 'package:commander_counter/features/cards/models/magic_card.dart';
+import 'package:commander_counter/features/cards/widgets/commander_card_search.dart';
 import 'package:commander_counter/features/life/constants/player_card_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -61,6 +63,20 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
         selectedManaColors.add(manaColor);
       }
     });
+  }
+
+  void selectCommanderCard(MagicCard card) {
+    setState(() {
+      commanderController.text = card.name;
+      selectedManaColors = card.colorIdentity
+          .map(manaColorFromSymbol)
+          .whereType<ManaColor>()
+          .toList();
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('${card.name} selecionado.')));
   }
 
   void save() {
@@ -134,6 +150,10 @@ class _EditPlayerBottomSheetState extends State<EditPlayerBottomSheet> {
                   border: const OutlineInputBorder(),
                 ),
               ),
+              if (widget.canEditCommander) ...[
+                const SizedBox(height: 16),
+                CommanderCardSearch(onCardSelected: selectCommanderCard),
+              ],
               const SizedBox(height: 24),
               Text(
                 'Identidade de cor',

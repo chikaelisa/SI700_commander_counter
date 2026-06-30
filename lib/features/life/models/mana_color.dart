@@ -69,3 +69,22 @@ extension ManaColorStyle on ManaColor {
     }
   }
 }
+
+ManaColor? manaColorFromSymbol(String symbol) {
+  switch (symbol.toUpperCase()) {
+    case 'W':
+      return ManaColor.white;
+    case 'U':
+      return ManaColor.blue;
+    case 'B':
+      return ManaColor.black;
+    case 'R':
+      return ManaColor.red;
+    case 'G':
+      return ManaColor.green;
+    case 'C':
+      return ManaColor.colorless;
+    default:
+      return null;
+  }
+}
