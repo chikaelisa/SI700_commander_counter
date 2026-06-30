@@ -1,3 +1,5 @@
+import 'package:commander_counter/features/auth/bloc/auth_bloc.dart';
+import 'package:commander_counter/features/auth/bloc/auth_state.dart';
 import 'package:commander_counter/features/counters/counters_page.dart';
 import 'package:commander_counter/features/game/game_page.dart';
 import 'package:commander_counter/features/history/bloc/match_history_bloc.dart';
@@ -20,8 +22,6 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int selectedIndex = 2;
 
-  bool isLoggedIn = false;
-
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -34,18 +34,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     });
   }
 
-  void login() {
-    setState(() {
-      isLoggedIn = true;
-    });
-  }
-
-  void logout() {
-    setState(() {
-      isLoggedIn = false;
-    });
-  }
-
   void goToLife() {
     setState(() {
       selectedIndex = 2;
@@ -54,6 +42,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+    final isLoggedIn = authState is AuthAuthenticated;
+
     final pages = [
       isLoggedIn
           ? GamePage(onGoToLife: goToLife)
@@ -65,7 +56,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
       LifePage(isLoggedIn: isLoggedIn),
 
-      ProfilePage(isLoggedIn: isLoggedIn, onLogin: login, onLogout: logout),
+      ProfilePage(),
     ];
 
     return BlocProvider(

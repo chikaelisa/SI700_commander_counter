@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/data/mock_auth_data_provider.dart';
 import 'navigation/main_navigation_page.dart';
 
 class CommanderCounterApp extends StatelessWidget {
@@ -7,14 +10,17 @@ class CommanderCounterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Commander Counter',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: const Color(0xFF6F5A7E),
+    return BlocProvider(
+      create: (context) => AuthBloc(dataProvider: MockAuthDataProvider()),
+      child: MaterialApp(
+        title: 'Commander Counter',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6F5A7E)),
+          useMaterial3: true,
+        ),
+        home: const MainNavigationPage(),
       ),
-      home: const MainNavigationPage(),
     );
   }
 }
