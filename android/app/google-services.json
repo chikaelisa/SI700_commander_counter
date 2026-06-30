@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "15999642239",
+    "firebase_url": "https://si1700-chika-default-rtdb.firebaseio.com",
+    "project_id": "si1700-chika",
+    "storage_bucket": "si1700-chika.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15999642239:android:fe691c99f0cbb91621ad4a",
+        "android_client_info": {
+          "package_name": "com.example.commander_counter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSSFJBkhc3IqKnFE5CrmA8VUnOR8OfTuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
