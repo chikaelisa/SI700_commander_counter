@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/data/mock_auth_data_provider.dart';
+import 'features/history/bloc/match_history_bloc.dart';
+import 'features/history/data/local_match_history_data_provider.dart';
 import 'navigation/main_navigation_page.dart';
 
 class CommanderCounterApp extends StatelessWidget {
@@ -10,8 +12,16 @@ class CommanderCounterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(dataProvider: MockAuthDataProvider()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AuthBloc(dataProvider: MockAuthDataProvider()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider()),
+        ),
+      ],
       child: MaterialApp(
         title: 'Commander Counter',
         debugShowCheckedModeBanner: false,
