@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../history/bloc/match_history_bloc.dart';
 import '../history/bloc/match_history_event.dart';
 import '../history/bloc/match_history_state.dart';
-import '../history/data/local_match_history_data_provider.dart';
 import 'constants/player_card_colors.dart';
 import 'models/mana_color.dart';
 import 'models/player_life.dart';
@@ -28,16 +27,6 @@ class _LifePageState extends State<LifePage> {
   int startingLife = 40;
   bool isCustomStartingLife = false;
   List<PlayerLife> players = [];
-
-  late final MatchHistoryBloc matchHistoryBloc = MatchHistoryBloc(
-    dataProvider: LocalMatchHistoryDataProvider(),
-  );
-
-  @override
-  void dispose() {
-    matchHistoryBloc.close();
-    super.dispose();
-  }
 
   void updatePlayerCount(int value) {
     setState(() {
@@ -177,7 +166,7 @@ class _LifePageState extends State<LifePage> {
       }).toList(),
     );
 
-    matchHistoryBloc.add(SaveMatchHistory(matchHistory));
+    context.read<MatchHistoryBloc>().add(SaveMatchHistory(matchHistory));
   }
 
   Future<void> showEditNameDialog(int index) async {
@@ -313,42 +302,39 @@ class _LifePageState extends State<LifePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: matchHistoryBloc,
-      child: BlocListener<MatchHistoryBloc, MatchHistoryState>(
-        listener: (context, state) {
-          if (state is MatchHistoryError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+    return BlocListener<MatchHistoryBloc, MatchHistoryState>(
+      listener: (context, state) {
+        if (state is MatchHistoryError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
 
-            return;
-          }
+          return;
+        }
 
-          if (state is MatchHistoryLoaded && state.successMessage != null) {
-            setState(() {
-              players = [];
-            });
+        if (state is MatchHistoryLoaded && state.successMessage != null) {
+          setState(() {
+            players = [];
+          });
 
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
 
-            return;
-          }
+          return;
+        }
 
-          if (state is MatchHistoryEmpty && state.successMessage != null) {
-            setState(() {
-              players = [];
-            });
+        if (state is MatchHistoryEmpty && state.successMessage != null) {
+          setState(() {
+            players = [];
+          });
 
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
-          }
-        },
-        child: _buildLifeContent(),
-      ),
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+        }
+      },
+      child: _buildLifeContent(),
     );
   }
 
