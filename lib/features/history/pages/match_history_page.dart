@@ -6,13 +6,23 @@ import '../bloc/match_history_event.dart';
 import '../bloc/match_history_state.dart';
 import '../models/match_history.dart';
 
-class MatchHistoryPage extends StatelessWidget {
+class MatchHistoryPage extends StatefulWidget {
   const MatchHistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    context.read<MatchHistoryBloc>().add(const LoadMatchHistory());
+  State<MatchHistoryPage> createState() => _MatchHistoryPageState();
+}
 
+class _MatchHistoryPageState extends State<MatchHistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<MatchHistoryBloc>().add(const LoadMatchHistory());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Histórico de partidas')),
       body: BlocConsumer<MatchHistoryBloc, MatchHistoryState>(
