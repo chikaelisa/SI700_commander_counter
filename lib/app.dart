@@ -5,13 +5,19 @@ import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/data/auth_data_provider.dart';
 import 'features/auth/data/firebase_auth_data_provider.dart';
 import 'features/history/bloc/match_history_bloc.dart';
-import 'features/history/data/local_match_history_data_provider.dart';
+import 'features/history/data/firestore_match_history_data_provider.dart';
+import 'features/history/data/match_history_data_provider.dart';
 import 'navigation/main_navigation_page.dart';
 
 class CommanderCounterApp extends StatelessWidget {
   final AuthDataProvider? authDataProvider;
+  final MatchHistoryDataProvider? matchHistoryDataProvider;
 
-  const CommanderCounterApp({super.key, this.authDataProvider});
+  const CommanderCounterApp({
+    super.key,
+    this.authDataProvider,
+    this.matchHistoryDataProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +29,10 @@ class CommanderCounterApp extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) =>
-              MatchHistoryBloc(dataProvider: LocalMatchHistoryDataProvider()),
+          create: (context) => MatchHistoryBloc(
+            dataProvider:
+                matchHistoryDataProvider ?? FirestoreMatchHistoryDataProvider(),
+          ),
         ),
       ],
       child: MaterialApp(

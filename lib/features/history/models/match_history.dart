@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class MatchHistory {
   final String id;
   final DateTime playedAt;
@@ -34,10 +36,22 @@ class MatchHistory {
     };
   }
 
+  Map<String, dynamic> toFirestoreJson() {
+    return {
+      'playedAt': Timestamp.fromDate(playedAt),
+      'playerCount': playerCount,
+      'winnerName': winnerName,
+      'comment': comment,
+      'players': players.map((player) => player.toJson()).toList(),
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+  }
+
   factory MatchHistory.fromJson(Map<String, dynamic> json) {
     return MatchHistory(
       id: json['id'] as String,
-      playedAt: DateTime.parse(json['playedAt'] as String),
+      playedAt: _parseDate(json['playedAt']),
       playerCount: json['playerCount'] as int,
       winnerName: json['winnerName'] as String?,
       comment: json['comment'] as String,
@@ -48,6 +62,41 @@ class MatchHistory {
           )
           .toList(),
     );
+  }
+
+  factory MatchHistory.fromFirestore({
+    required String id,
+    required Map<String, dynamic> json,
+  }) {
+    return MatchHistory(
+      id: id,
+      playedAt: _parseDate(json['playedAt']),
+      playerCount: json['playerCount'] as int? ?? 0,
+      winnerName: json['winnerName'] as String?,
+      comment: json['comment'] as String? ?? '',
+      players: (json['players'] as List<dynamic>? ?? [])
+          .map(
+            (playerJson) =>
+                MatchPlayerHistory.fromJson(playerJson as Map<String, dynamic>),
+          )
+          .toList(),
+    );
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is String) {
+      return DateTime.parse(value);
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    return DateTime.now();
   }
 }
 
@@ -72,9 +121,9 @@ class MatchPlayerHistory {
 
   factory MatchPlayerHistory.fromJson(Map<String, dynamic> json) {
     return MatchPlayerHistory(
-      playerName: json['playerName'] as String,
-      commanderName: json['commanderName'] as String,
-      finalLife: json['finalLife'] as int,
+      playerName: json['playerName'] as String? ?? '',
+      commanderName: json['commanderName'] as String? ?? '',
+      finalLife: json['finalLife'] as int? ?? 0,
     );
   }
 }
