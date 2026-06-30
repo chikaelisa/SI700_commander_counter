@@ -1,4 +1,5 @@
 import 'package:commander_counter/features/history/bloc/match_history_bloc.dart';
+import 'package:commander_counter/features/life/models/mana_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -209,6 +210,10 @@ class MatchHistoryCard extends StatelessWidget {
     required this.onEditComment,
   });
 
+  List<ManaColor> parseManaColors(List<String> symbols) {
+    return symbols.map(manaColorFromSymbol).whereType<ManaColor>().toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateText =
@@ -247,23 +252,106 @@ class MatchHistoryCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
           ],
-          ...match.players.map(
-            (player) => ListTile(
+
+          ...match.players.map((player) {
+            final manaColors = parseManaColors(player.manaColors);
+
+            return ListTile(
               contentPadding: EdgeInsets.zero,
+              leading: CommanderHistoryImage(
+                imageUrl: player.commanderImageUrl,
+              ),
               title: Text(player.playerName),
-              subtitle: Text(
-                player.commanderName.trim().isEmpty
-                    ? 'Sem comandante informado'
-                    : player.commanderName,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    player.commanderName.trim().isEmpty
+                        ? 'Sem comandante informado'
+                        : player.commanderName,
+                  ),
+                  if (manaColors.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    ManaHistoryRow(manaColors: manaColors),
+                  ],
+                ],
               ),
               trailing: Text(
                 '${player.finalLife}',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
+    );
+  }
+}
+
+class CommanderHistoryImage extends StatelessWidget {
+  final String? imageUrl;
+
+  const CommanderHistoryImage({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = imageUrl != null && imageUrl!.trim().isNotEmpty;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: 44,
+        height: 60,
+        child: hasImage
+            ? Image.network(
+                imageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const ColoredBox(
+                    color: Color(0xFFE5E7EB),
+                    child: Icon(Icons.broken_image_outlined),
+                  );
+                },
+              )
+            : const ColoredBox(
+                color: Color(0xFFE5E7EB),
+                child: Icon(Icons.image_not_supported_outlined),
+              ),
+      ),
+    );
+  }
+}
+
+class ManaHistoryRow extends StatelessWidget {
+  final List<ManaColor> manaColors;
+
+  const ManaHistoryRow({super.key, required this.manaColors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: manaColors.map((manaColor) {
+        return Container(
+          width: 22,
+          height: 22,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: manaColor.backgroundColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black, width: 1),
+          ),
+          child: Text(
+            manaColor.symbol,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: manaColor.foregroundColor,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
